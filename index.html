@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 90%;
+      max-width: 900px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0px 8px 20px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #ffcc70;
+    }
+    input, button, select {
+      padding: 12px;
+      margin: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    input {
+      width: 80%;
+    }
+    button {
+      background: #ffcc70;
+      color: #333;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ffaa00;
+      transform: scale(1.05);
+    }
+    .question {
+      margin: 20px 0;
+      text-align: left;
+      font-size: 18px;
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 10px;
+    }
+    label {
+      display: block;
+      margin: 6px 0;
+      cursor: pointer;
+    }
+    .result {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+      padding: 15px;
+      background: #222;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Android Development Quiz</h1>
+
+    <div id="student-form">
+        <input type="text" id="studentName" placeholder="Your Name" required>
+      <input type="text" id="roll" placeholder="Enter your Roll Number" required><br>
+      <input type="text" id="semester" placeholder="Enter your Semester" required><br>
+      <button onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <form id="quizForm" style="display:none;" onsubmit="return submitQuiz()">
+      <div id="quiz"></div>
+      <button type="submit">Submit Quiz</button>
+    </form>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {q: "Android is based on which kernel?", options: ["Linux Kernel", "Windows Kernel", "Mac Kernel"], answer: "Linux Kernel"},
+      {q: "Which language is mainly used for Android Development?", options: ["Java", "Python", "C++"], answer: "Java"},
+      {q: "Which company developed Android?", options: ["Google", "Apple", "Microsoft"], answer: "Google"},
+      {q: "What is APK in Android?", options: ["Application Package", "Android Phone Kit", "Application Programming Kernel"], answer: "Application Package"},
+      {q: "Which tool is used to develop Android apps?", options: ["Android Studio", "Xcode", "Eclipse"], answer: "Android Studio"},
+      {q: "Which database is used in Android?", options: ["SQLite", "MySQL", "PostgreSQL"], answer: "SQLite"},
+      {q: "Which file is entry point of Android app?", options: ["MainActivity.java", "AndroidManifest.xml", "Gradle file"], answer: "MainActivity.java"},
+      {q: "Android apps are mostly written in?", options: ["Java/Kotlin", "Swift", "Ruby"], answer: "Java/Kotlin"},
+      {q: "Which is not a layout in Android?", options: ["LinearLayout", "RelativeLayout", "AbsoluteGrid"], answer: "AbsoluteGrid"},
+      {q: "Which version introduced Material Design?", options: ["Lollipop", "KitKat", "JellyBean"], answer: "Lollipop"},
+      {q: "What does AAPT stand for?", options: ["Android Asset Packaging Tool", "Advanced App Processing Tool", "Android Application Parsing Tool"], answer: "Android Asset Packaging Tool"},
+      {q: "Which component is used for background tasks?", options: ["Service", "Activity", "Broadcast"], answer: "Service"},
+      {q: "What is ANR in Android?", options: ["Application Not Responding", "Android Not Running", "Application Not Rendering"], answer: "Application Not Responding"},
+      {q: "Which store hosts Android apps?", options: ["Google Play Store", "App Store", "Microsoft Store"], answer: "Google Play Store"},
+      {q: "What is Gradle used for?", options: ["Build Automation", "UI Design", "Database"], answer: "Build Automation"},
+      {q: "Which emulator is used in Android?", options: ["AVD", "VirtualBox", "VMWare"], answer: "AVD"},
+      {q: "Which method is called when app launches?", options: ["onCreate()", "onStart()", "onResume()"], answer: "onCreate()"},
+      {q: "Which widget is used for single line text input?", options: ["EditText", "TextView", "Button"], answer: "EditText"},
+      {q: "Which permission is needed for Internet?", options: ["android.permission.INTERNET", "android.permission.ACCESS_WIFI", "android.permission.WEB"], answer: "android.permission.INTERNET"},
+      {q: "Which file stores XML UI designs?", options: ["res/layout", "src/java", "drawable"], answer: "res/layout"}
+    ];
+
+    function startQuiz() {
+      const name = document.getElementById("name").value.trim();
+      const roll = document.getElementById("roll").value.trim();
+      const semester = document.getElementById("semester").value.trim();
+
+      if (!name || !roll || !semester) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      const key = roll + "_" + semester;
+      if (localStorage.getItem(key)) {
+        alert("You have already attempted this quiz.");
+        return;
+      }
+
+      document.getElementById("student-form").style.display = "none";
+      document.getElementById("quizForm").style.display = "block";
+
+      const quizDiv = document.getElementById("quiz");
+      quizDiv.innerHTML = "";
+
+      questions.forEach((q, i) => {
+        let html = `<div class="question">
+                      <p><b>Q${i+1}. ${q.q}</b></p>`;
+        q.options.forEach(opt => {
+          html += `<label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label>`;
+        });
+        html += "</div>";
+        quizDiv.innerHTML += html;
+      });
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      let attemptedAll = true;
+
+      questions.forEach((q, i) => {
+        const ans = document.querySelector(`input[name="q${i}"]:checked`);
+        if (!ans) attemptedAll = false;
+        else if (ans.value === q.answer) score++;
+      });
+
+      if (!attemptedAll) {
+        alert("You must answer all questions before submitting!");
+        return false;
+      }
+
+      const roll = document.getElementById("roll").value.trim();
+      const semester = document.getElementById("semester").value.trim();
+      const key = roll + "_" + semester;
+
+      localStorage.setItem(key, score);
+
+      document.getElementById("quizForm").style.display = "none";
+      document.getElementById("result").innerText = 
+        "Your Score: " + score + " / " + questions.length;
+
+      return false;
+    }
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTehq8TIWyuXx7NfU6-UlMxyrBr8x2ebq1h_tPzUK2-X1yocKoi2NaJtIDJfatmL9lmA/exec";
+
+function submitQuiz() {
+  let score = 0;
+
+  let q1 = document.querySelector('input[name="q1"]:checked');
+  if (q1 && q1.value === "b") score++;
+
+  let q2 = document.querySelector('input[name="q2"]:checked');
+  if (q2 && q2.value === "a") score++;
+
+  let name = document.getElementById("studentName").value;
+  if (!name) {
+    alert("Please enter your name!");
+    return;
+  }
+
+  document.getElementById("result").innerHTML = Aapka Score: ${score}/2;
+
+  // 👇 Ye part Google Sheet me data bhejega
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({ name: name, score: score })
+  })
+  .then(res => res.text())
+  .then(data => console.log("Saved: " + data))
+  .catch(err => console.error("Error: " + err));
+}
+  </script>
+</body>
+</html>
